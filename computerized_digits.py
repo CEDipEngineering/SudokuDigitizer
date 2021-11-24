@@ -4,14 +4,14 @@ from PIL import ImageDraw
 from typing import Tuple, List
 import numpy as np
 import matplotlib.pyplot as plt
-fonts = ['Cambria.ttc', 'Calibril.ttf', 'Consola.ttf', 'Cour.ttf', 'Arial.ttf', 'Segoeuil.ttf']
+fonts = ['calibril.ttf', 'consola.ttf', 'cour.ttf', 'arial.ttf', 'segoeuil.ttf', 'cambria.ttc']
 digits = [str(x) for x in range(10)]
 
 def make_image(center: Tuple[int, int], text: str, font: str, font_size: int):
     img = Image.new('L', (28,28))
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("arial.ttf", 20)
-    draw.text(center,text,(255),font=font, anchor='mm', align='center')
+    fonttt = ImageFont.truetype(font, font_size)
+    draw.text(center,text,(255),font=fonttt, anchor='mm', align='center')
     # img.show()
     return img
 
