@@ -4,7 +4,7 @@ from PIL import ImageDraw
 from typing import Tuple, List
 import numpy as np
 import matplotlib.pyplot as plt
-fonts = ['calibril.ttf', 'consola.ttf', 'cour.ttf', 'arial.ttf', 'segoeuil.ttf', 'cambria.ttc']
+fonts = ['calibril.ttf', 'cour.ttf', 'arial.ttf', 'segoeuil.ttf']
 digits = [str(x) for x in range(10)]
 
 def make_image(center: Tuple[int, int], text: str, font: str, font_size: int):
@@ -37,4 +37,4 @@ def plot_examples(arr: List):
 
 if __name__ == '__main__':
     train = make_training_array(50)
-    plot_examples(train['4'][:10])
+    plot_examples(train['7'][:10])
