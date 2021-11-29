@@ -1,6 +1,6 @@
 import numpy as np
 
-def digitize(array: np.ndarray):
+def print_sudoku(array: np.ndarray):
     '''
     Receives np.ndarray of shape (9,9); prints 
     formatted string to resemble sudoku game
@@ -27,4 +27,4 @@ def digitize(array: np.ndarray):
     print(out)
 
 if __name__ == '__main__':
-    digitize(np.random.randint(0,10,81).reshape((9,9)))
+    print_sudoku(np.random.randint(0,10,81).reshape((9,9)))
