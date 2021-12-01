@@ -5,7 +5,7 @@ from typing import Tuple, List
 import numpy as np
 import matplotlib.pyplot as plt
 fonts = ['calibril.ttf', 'cour.ttf', 'arial.ttf', 'segoeuil.ttf']
-digits = [str(x) for x in range(10)]
+digits = [str(x) for x in range(1,10)]
 
 def make_image(center: Tuple[int, int], text: str, font: str, font_size: int):
     img = Image.new('L', (28,28))
