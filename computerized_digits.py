@@ -34,7 +34,6 @@ def plot_examples(arr: List):
         plt.imshow(image, cmap='gray')
     plt.show()
 
-
 if __name__ == '__main__':
     train = make_training_array(50)
     plot_examples(train['7'][:10])
