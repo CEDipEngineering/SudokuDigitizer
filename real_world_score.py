@@ -1,5 +1,7 @@
 import cv2 as cv
 from matplotlib.pyplot import imshow, show, figure
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 import numpy as np
 import keras
 import os
@@ -160,12 +162,62 @@ def digitize(img, model):
     preds = predict_all_cells(img, model)
     return np.array([c*p[0] for c,p in zip(cell_arr,preds)]).reshape((9,9))
 
+def plot_confusion_matrix(y_true, y_pred, classes, normalize=True, title=None, cmap=plt.cm.Greens, save_to_file = False):
+    if not title:
+        if normalize:
+            title = 'Normalized confusion matrix'
+        else:
+            title = 'Confusion matrix, without normalization'
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        #print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    #print(cm)
+
+    fig, ax = plt.subplots(figsize = (16,16))
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           xticklabels=classes, yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
+
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    if save_to_file:
+        plt.savefig(title + '.pdf')
+    return ax
+
 if __name__ == '__main__':
 
+    FLAG_TEST = 0 # 0 means testing CNN quality, 1 means testing Full model quality
     model = keras.models.load_model('./CNN_MNIST_COMP_v3')
+    
+    
+    data_dir = 'sudoku/test_curated/jpg/'
+    if FLAG_TEST:
+        data_dir = 'sudoku/test_full/'
     total, total_hits = 0,0
-    for img_fn in os.listdir('./sudoku/jpg/'):
-        img_name = './sudoku/jpg/' + img_fn
+    confusion_data = []
+    total_imgs = len(os.listdir(data_dir))
+    for curr_img_index, img_fn in enumerate(os.listdir(data_dir)):
+        img_name = data_dir + img_fn
         with open(img_name.replace('jpg','dat'), 'r') as f:
             y = f.read()
             nums = y.split('\n')[2:]
@@ -183,9 +235,16 @@ if __name__ == '__main__':
         # print(img_name)
         # print(arr_y)
         # cv2_imshow(result)
+        flat_arr_y = arr_y.ravel()
+        flat_arr = arr.ravel()
+        for i in range(len(flat_arr_y)):
+            # if flat_arr_y[i] == 0: continue
+            confusion_data.append([str(flat_arr_y[i]),flat_arr[i]])
         hits = (np.equal(arr, arr_y)*np.array(bin_arr).reshape((9,9))).astype(int).ravel().sum() 
         sub_total = sum(bin_arr)
-        print(f'Score is {100*hits/sub_total:.02f}% or {hits}/{sub_total}')
+        print(f'Score is {100*hits/sub_total:.02f}% or {hits}/{sub_total} ({curr_img_index+1}/{total_imgs})')
         total += sub_total
-        total_hits += hits 
+        total_hits += hits
+    confusion_data = np.array(confusion_data)
+    plot_confusion_matrix(confusion_data[:,0], confusion_data[:,1], list(map(lambda x: str(x), range(10))), save_to_file=True)
     print(f'Total score is {100*total_hits/total:.02f}% or {total_hits}/{total}')
