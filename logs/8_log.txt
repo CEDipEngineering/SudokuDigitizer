@@ -1,0 +1,13 @@
+========================================
+SUMMARY
+Model = Random_Forest
+========================================
+
+Score for image1005.jpg is 100.00% or 23/23
+Score for image1009.jpg is 96.43% or 27/28
+Score for image1019.jpg is 93.94% or 31/33
+Score for image1072.jpg is 91.67% or 33/36
+Score for image18.jpg is 92.86% or 26/28
+Score for image210.jpg is 92.31% or 24/26
+Score for image211.jpg is 77.78% or 21/27
+Score for image46.jpg is 88.89% or 32/36
