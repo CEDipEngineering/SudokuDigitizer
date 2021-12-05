@@ -1,0 +1,13 @@
+========================================
+SUMMARY
+Model = ./CNN_MNIST_v1
+========================================
+
+Score for image1005.jpg is 100.00% or 23/23
+Score for image1009.jpg is 85.71% or 24/28
+Score for image1019.jpg is 63.64% or 21/33
+Score for image1072.jpg is 66.67% or 24/36
+Score for image18.jpg is 67.86% or 19/28
+Score for image210.jpg is 80.77% or 21/26
+Score for image211.jpg is 92.59% or 25/27
+Score for image46.jpg is 75.00% or 27/36

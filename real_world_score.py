@@ -204,47 +204,64 @@ def plot_confusion_matrix(y_true, y_pred, classes, normalize=True, title=None, c
         plt.savefig(title + '.pdf')
     return ax
 
-if __name__ == '__main__':
+def main(model_name: str, flag_test: int):
+    FLAG_TEST = flag_test # 0 means testing CNN quality, 1 means testing Full model quality
 
-    FLAG_TEST = 0 # 0 means testing CNN quality, 1 means testing Full model quality
-    model = keras.models.load_model('./CNN_MNIST_COMP_v3')
-    
-    
+    model = keras.models.load_model(model_name)
+    log_str = f'{"="*40}\nSUMMARY\nModel = {model_name}\n{"="*40}\n\n'
     data_dir = 'sudoku/test_curated/jpg/'
     if FLAG_TEST:
         data_dir = 'sudoku/test_full/'
     total, total_hits = 0,0
     confusion_data = []
-    total_imgs = len(os.listdir(data_dir))
-    for curr_img_index, img_fn in enumerate(os.listdir(data_dir)):
-        img_name = data_dir + img_fn
-        with open(img_name.replace('jpg','dat'), 'r') as f:
-            y = f.read()
-            nums = y.split('\n')[2:]
-            del nums[-1]
-            nums = list(map(lambda x: x.replace(' ', ''), nums))
-            arr_y = []
-            for line in nums:
-                for char in line:
-                    arr_y.append(int(char))
-            arr_y = np.array(arr_y).reshape((9,9))
-        result = adaptive_threshold_cleanup(produce_transform(img_name, 9*28))
-        arr = digitize(result, model)
-        bin_arr = get_cell_array(result)
-        # print(f'{arr=}','\n', f'{arr_y=}')
-        # print(img_name)
-        # print(arr_y)
-        # cv2_imshow(result)
-        flat_arr_y = arr_y.ravel()
-        flat_arr = arr.ravel()
-        for i in range(len(flat_arr_y)):
-            # if flat_arr_y[i] == 0: continue
-            confusion_data.append([str(flat_arr_y[i]),flat_arr[i]])
-        hits = (np.equal(arr, arr_y)*np.array(bin_arr).reshape((9,9))).astype(int).ravel().sum() 
-        sub_total = sum(bin_arr)
-        print(f'Score is {100*hits/sub_total:.02f}% or {hits}/{sub_total} ({curr_img_index+1}/{total_imgs})')
-        total += sub_total
-        total_hits += hits
+    total_imgs = len(list(filter(lambda x: x.endswith('.jpg'), os.listdir(data_dir))))
+    errorlist = []
+    for curr_img_index, img_fn in enumerate(list(filter(lambda x: x.endswith('.jpg'), os.listdir(data_dir)))):
+        try:
+            img_name = data_dir + img_fn
+            with open(img_name.replace('jpg','dat'), 'r') as f:
+                y = f.read()
+                nums = y.split('\n')[2:]
+                del nums[-1]
+                nums = list(map(lambda x: x.replace(' ', ''), nums))
+                arr_y = []
+                for line in nums:
+                    for char in line:
+                        arr_y.append(int(char))
+                arr_y = np.array(arr_y).reshape((9,9))
+            result = adaptive_threshold_cleanup(produce_transform(img_name, 9*28))
+            arr = digitize(result, model)
+            bin_arr = get_cell_array(result)
+            # print(f'{arr=}','\n', f'{arr_y=}')
+            # print(img_name)
+            # print(arr_y)
+            # cv2_imshow(result)
+            flat_arr_y = arr_y.ravel()
+            flat_arr = arr.ravel()
+            for i in range(len(flat_arr_y)):
+                # if flat_arr_y[i] == 0: continue
+                confusion_data.append([str(flat_arr_y[i]),flat_arr[i]])
+            hits = (np.equal(arr, arr_y)*np.array(bin_arr).reshape((9,9))).astype(int).ravel().sum() 
+            sub_total = sum(bin_arr)
+            print(f'Score is {100*hits/sub_total:.02f}% or {hits}/{sub_total} ({curr_img_index+1}/{total_imgs})')
+            log_str += f'Score for {img_fn} is {100*hits/sub_total:.02f}% or {hits}/{sub_total}\n'
+            total += sub_total
+            total_hits += hits
+        except Exception as e:
+            print(f'Encountered exception {e} at image {img_name}')
+            log_str += f'Encountered exception {e} at image {img_name}\n'
+            errorlist.append(img_name)
+
+    log_num = len(list(filter(lambda x: x.endswith('log.txt'), os.listdir('./logs'))))
+    log_name = f"./logs/{log_num}_log.txt" # Automatic log counter
+    with open(log_name, 'w') as f:
+        f.write(log_str)
     confusion_data = np.array(confusion_data)
-    plot_confusion_matrix(confusion_data[:,0], confusion_data[:,1], list(map(lambda x: str(x), range(10))), save_to_file=True)
+    plot_confusion_matrix(confusion_data[:,0], confusion_data[:,1], list(map(lambda x: str(x), range(10))), save_to_file=True, title=f'./logs/experiment_{log_num}')
     print(f'Total score is {100*total_hits/total:.02f}% or {total_hits}/{total}')
+    print(errorlist)
+
+if __name__ == '__main__':
+    for mn in ['CNN_MNIST_COMP_V1', 'CNN_MNIST_COMP_v2', 'CNN_MNIST_COMP_v3', 'CNN_MNIST_v1']:
+        main(f'./{mn}', 0)
+        main(f'./{mn}', 1)
