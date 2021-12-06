@@ -11,3 +11,5 @@ Score for image18.jpg is 92.86% or 26/28
 Score for image210.jpg is 92.31% or 24/26
 Score for image211.jpg is 77.78% or 21/27
 Score for image46.jpg is 88.89% or 32/36
+
+Total score is 91.56% or 217/237
