@@ -251,7 +251,7 @@ def main(model_name: str, flag_test: int):
             print(f'Encountered exception {e} at image {img_name}')
             log_str += f'Encountered exception {e} at image {img_name}\n'
             errorlist.append(img_name)
-
+    log_str += f'\nTotal score is {100*total_hits/total:.02f}% or {total_hits}/{total}\n'
     log_num = len(list(filter(lambda x: x.endswith('log.txt'), os.listdir('./logs'))))
     log_name = f"./logs/{log_num}_log.txt" # Automatic log counter
     with open(log_name, 'w') as f:

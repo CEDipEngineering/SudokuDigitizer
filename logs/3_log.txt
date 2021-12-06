@@ -203,3 +203,5 @@ Score for image96.jpg is 29.03% or 9/31
 Score for image97.jpg is 43.33% or 13/30
 Score for image98.jpg is 47.06% or 16/34
 Score for image99.jpg is 47.06% or 16/34
+
+Total score is 47.02% or 3232/6874
